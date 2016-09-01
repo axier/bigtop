@@ -13,19 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM bigtop/puppet:ubuntu-14.04
+docker:
+        memory_size: "4096"
+        image:  "bigtop/deploy:debian-8"
 
-# enable ssh
-RUN apt-get update && \
-    apt-get install -y openssh-server vim && \
-    mkdir -p /var/run/sshd && \
-    # requiretty off
-    sed -i.bak 's/requiretty/!requiretty/' /etc/sudoers && \
-    # setup vagrant account
-    mkdir -p /root/.ssh && \
-    chmod 0700 /root/.ssh && \
-    wget http://github.com/mitchellh/vagrant/raw/master/keys/vagrant.pub --no-check-certificate -O /root/.ssh/authorized_keys && \
-    chmod 0600 /root/.ssh/authorized_keys
+boot2docker:
+        memory_size: "4096"
+        number_cpus: "1"
 
-CMD /sbin/init
-
+repo: "http://bigtop-repos.s3.amazonaws.com/releases/1.0.0/debian/8/x86_64"
+distro: debian
+components: [hadoop, yarn]
+namenode_ui_port: "50070"
+yarn_ui_port: "8088"
+hbase_ui_port: "60010"
+enable_local_repo: false
+smoke_test_components: [mapreduce, pig]
+jdk: "openjdk-7-jdk"
