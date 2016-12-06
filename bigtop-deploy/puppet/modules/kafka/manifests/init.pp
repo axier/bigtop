@@ -17,14 +17,15 @@ class kafka {
 
   class deploy ($roles) {
     if ('kafka-server' in $roles) {
-      include server
+      include kafka::server
     }
   }
 
   class server(
+      $bind_addr = undef,
       $broker_id = "0",
       $port = "9092",
-      $zookeeper_connection_string = "localhost:2181"
+      $zookeeper_connection_string = "localhost:2181",
     ) {
 
     package { 'kafka':

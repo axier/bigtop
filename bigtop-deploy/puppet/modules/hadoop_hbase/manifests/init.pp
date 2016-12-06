@@ -36,15 +36,15 @@ class hadoop_hbase {
     }
   }
 
-  class client-package  {
+  class client_package  {
     package { "hbase":
       ensure => latest,
-    } 
+    }
   }
 
   class common_config ($rootdir, $zookeeper_quorum, $kerberos_realm = "", $heap_size="1024") {
-    include client-package
-    if ($kerberos_realm) {
+    include hadoop_hbase::client_package
+    if ($kerberos_realm and $kerberos_realm != "") {
       require kerberos::client
       kerberos::host_keytab { "hbase": 
         spnego => true,
@@ -68,7 +68,7 @@ class hadoop_hbase {
   }
 
   class client($thrift = false) {
-    include common_config
+    include hadoop_hbase::common_config
 
     if ($thrift) {
       package { "hbase-thrift":
@@ -87,7 +87,7 @@ class hadoop_hbase {
   }
 
   class server {
-    include common_config
+    include hadoop_hbase::common_config
 
     package { "hbase-regionserver":
       ensure => latest,
@@ -104,7 +104,7 @@ class hadoop_hbase {
   }
 
   class master {
-    include common_config
+    include hadoop_hbase::common_config
 
     package { "hbase-master":
       ensure => latest,

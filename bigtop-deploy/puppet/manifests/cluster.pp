@@ -97,6 +97,7 @@ $roles_map = {
     client => ["pig-client"],
   },
   hive => {
+    master => ["hive-server2", "hive-metastore"],
     client => ["hive-client"],
   },
   tez => {
@@ -116,6 +117,10 @@ $roles_map = {
     master => ["qfs-metaserver"],
     worker => ["qfs-chunkserver"],
     client => ["qfs-client"],
+  },
+  gpdb => {
+    master => ["gpdb-master"],
+    worker => ["gpdb-segment"],
   },
   kafka => {
     master => ["kafka-server"],
@@ -189,7 +194,8 @@ class node_with_roles ($roles = hiera("bigtop::roles")) inherits hadoop_cluster_
     "ycsb",
     "kerberos",
     "zeppelin",
-    "kafka"
+    "kafka",
+    "gpdb"
   ]
 
   deploy_module { $modules:

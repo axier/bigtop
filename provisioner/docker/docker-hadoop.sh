@@ -19,7 +19,7 @@ usage() {
     echo "usage: $PROG [-C file ] args"
     echo "       -C file                                   Use alternate file for config.yaml"
     echo "  commands:"
-    echo "       -c NUM_INSTANCES, --create=NUM_INSTANCES  Create a Docker based Bigtop Hadoop cluster"
+    echo "       -c NUM_INSTANCES, --create NUM_INSTANCES  Create a Docker based Bigtop Hadoop cluster"
     echo "       -d, --destroy                             Destroy the cluster"
     echo "       -e, --exec INSTANCE_NO|INSTANCE_NAME      Execute command on a specific instance. Instance can be specified by name or number."
     echo "                                                 For example: $PROG --exec 1 bash"
@@ -72,7 +72,7 @@ create() {
 
 generate-hosts() {
     for node in ${NODES[*]}; do
-        entry=`docker inspect --format "{{.NetworkSettings.IPAddress}} {{.Config.Hostname}}.{{.Config.Domainname}}" $node`
+        entry=`docker inspect --format "{{.NetworkSettings.IPAddress}} {{.Config.Hostname}}.{{.Config.Domainname}} {{.Config.Hostname}}" $node`
         docker exec ${NODES[0]} bash -c "echo $entry >> /etc/hosts"
     done
     wait
@@ -101,7 +101,6 @@ copy-to-instances() {
 
 bootstrap() {
     for node in ${NODES[*]}; do
-        docker cp  $1 $node:$2 &
         docker exec $node bash -c "/bigtop-home/bigtop-deploy/vm/utils/setup-env-$1.sh $2" &
     done
     wait
@@ -131,7 +130,7 @@ destroy() {
 }
 
 bigtop-puppet() {
-    docker exec $1 bash -c 'puppet apply -d --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules /bigtop-home/bigtop-deploy/puppet/manifests/site.pp'
+    docker exec $1 bash -c 'puppet apply --parser future --modulepath=/bigtop-home/bigtop-deploy/puppet/modules:/etc/puppet/modules /bigtop-home/bigtop-deploy/puppet/manifests'
 }
 
 get-yaml-config() {
@@ -171,7 +170,12 @@ env-check() {
 }
 
 list() {
-    docker-compose -p $PROVISION_ID ps
+    local msg
+    msg=$(docker-compose -p $PROVISION_ID ps 2>&1)
+    if [ $? -ne 0 ]; then
+        msg="Cluster hasn't been created yet."
+    fi
+    echo "$msg"
 }
 
 PROG=`basename $0`
