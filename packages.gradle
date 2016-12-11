@@ -28,6 +28,16 @@ buildscript {
     // must be added to the classpath.
     classpath 'org.eclipse.jgit:org.eclipse.jgit.java7:3.6.2.201501210735-r'
   }
+  uploadArchives {
+    repositories {
+      mavenDeployer {
+        repository(url: "http://yum-nexus-1.vagrant.local:8081/nexus/content/repositories/snapshots") { authentication(userName: "admin", password: "admin123") }
+        pom.version = "1.2.0-SNAPSHOT"
+        pom.artifactId = "Bigtop"
+        pom.groupId = "bigtop"
+      }
+    }
+  }
 }
 
 apply plugin: 'java'
