@@ -30,12 +30,8 @@ buildscript {
   }
   uploadArchives {
     repositories {
-      ivy {
-        credentials {
-          username "admin"
-          password "admin123"
-        }
-        url "http://yum-nexus-1.vagrant.local:8081/nexus/content/repositories/snapshots"
+      mavenDeployer {
+        repository(url: "http://yum-nexus-1.vagrant.local:8081/nexus/content/repositories/snapshots") { authentication(userName: "admin", password: "admin123") }
       }
     }
   }
